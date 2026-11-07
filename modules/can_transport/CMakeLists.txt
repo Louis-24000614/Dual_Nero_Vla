@@ -1,0 +1,11 @@
+add_library(dual_nero_can_transport src/can_transport.cpp)
+target_include_directories(dual_nero_can_transport PUBLIC include)
+target_compile_options(dual_nero_can_transport PRIVATE -Wall -Wextra -Wpedantic)
+
+if(BUILD_TESTING)
+  add_executable(can_transport_test tests/can_transport_test.cpp)
+  target_compile_options(can_transport_test PRIVATE -Wall -Wextra -Wpedantic)
+  target_link_libraries(can_transport_test PRIVATE dual_nero_can_transport GTest::gtest_main)
+  include(GoogleTest)
+  gtest_discover_tests(can_transport_test)
+endif()

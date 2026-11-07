@@ -7,8 +7,8 @@ The runtime is **Target design — not implemented.** Items below are the execut
 ## Phase A — read-only driver
 
 - [ ] Pin `can_left` and `can_right`.
-- [ ] Implement `CanTransport`.
-- [ ] Record raw CAN frames.
+- [x] Implement `CanTransport`.
+- [x] Record raw CAN frames with `record_can`.
 - [ ] Identify the firmware profile.
 - [ ] Parse joint feedback for both arms.
 - [ ] Compare each parsed field with `pyAgxArm`.
@@ -68,4 +68,4 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Expected result today: configuration succeeds, the build has no targets, and ctest finds no tests.
+Expected result today: configuration succeeds, `can_transport_test` passes five closed-socket and missing-interface cases, and `record_can` is built. Those tests do not open a live bus.

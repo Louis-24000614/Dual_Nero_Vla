@@ -2,11 +2,11 @@
 
 [English](../../docs/develop/modules.md) | [架构](../design/architecture_cn.md)
 
-**目标设计，尚未实现。** 下面的模块都还没有编译。线上字段只写在 [IPC 契约](../interfaces/ipc_cn.md) 里。交付清单是[路线图](../maintenance/roadmap_cn.md)。风格规则在[代码风格](code_style_cn.md)。
+**目标设计，服务尚未实现。** `CanTransport` 已经编译，只搬运 SocketCAN 原始帧，不解析 Nero 字段。线上字段只写在 [IPC 契约](../interfaces/ipc_cn.md) 里。交付清单是[路线图](../maintenance/roadmap_cn.md)。风格规则在[代码风格](code_style_cn.md)。
 
 ## 目录
 
-产品树按模块增长。根目录 `CMakeLists.txt` 今天只固定语言标准。
+产品树按模块增长。根目录 `CMakeLists.txt` 固定语言标准，并编译 `dual_nero_can_transport` 和只读工具 `record_can`。
 
 ```text
 CMakeLists.txt

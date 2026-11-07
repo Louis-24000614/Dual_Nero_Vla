@@ -65,7 +65,7 @@ candump can_right
 
 ## 配置构建
 
-根工程目前只设定 C++ 标准，不编译服务。
+根工程设定 C++ 标准，并编译只读工具 `record_can`。它还不编译 `dual_nero_server`。
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -75,7 +75,7 @@ ctest --test-dir build --output-on-failure
 
 安装 `ninja-build` 之后，可以在 `cmake -S` 命令上加上 `-G Ninja`。
 
-`cmake --build build` 在没有目标时成功。`ctest` 会报告没有发现测试。这是当前结果，不是机械臂测试通过。
+`cmake --build build` 会生成 `build/apps/record_can`。`ctest` 运行 `can_transport_test`，检查未打开的套接字和缺失的接口。这不是机械臂测试通过。
 
 ## 真机顺序
 

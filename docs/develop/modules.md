@@ -2,11 +2,11 @@
 
 [中文](../../docs_cn/develop/modules_cn.md) | [Architecture](../design/architecture.md)
 
-**Target design — not implemented.** No module below is compiled. Wire fields live only in the [IPC contract](../interfaces/ipc.md). The delivery checklist is the [roadmap](../maintenance/roadmap.md). Style rules are in [code style](code_style.md).
+**Target design — the server is not implemented.** `CanTransport` is compiled and moves raw SocketCAN frames only. It does not decode Nero fields. Wire fields live only in the [IPC contract](../interfaces/ipc.md). The delivery checklist is the [roadmap](../maintenance/roadmap.md). Style rules are in [code style](code_style.md).
 
 ## Layout
 
-The product tree grows by module. The root `CMakeLists.txt` only pins the language standard today.
+The product tree grows by module. The root `CMakeLists.txt` pins the language standard and builds `dual_nero_can_transport` plus the read-only `record_can` tool.
 
 ```text
 CMakeLists.txt

@@ -65,7 +65,7 @@ candump can_right
 
 ## Configure the build
 
-The root project sets the C++ standard and does not compile a server yet.
+The root project sets the C++ standard and builds the read-only `record_can` tool. It does not compile `dual_nero_server` yet.
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -75,7 +75,7 @@ ctest --test-dir build --output-on-failure
 
 After `ninja-build` is installed, add `-G Ninja` to the `cmake -S` command.
 
-`cmake --build build` succeeds with no targets. `ctest` reports that no tests were found. That is the current result, not a passing arm test.
+`cmake --build build` produces `build/apps/record_can`. `ctest` runs `can_transport_test`, which checks a closed socket and a missing interface. That is not a passing arm test.
 
 ## Hardware order
 

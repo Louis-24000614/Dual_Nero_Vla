@@ -7,8 +7,8 @@
 ## 阶段 A — 只读驱动
 
 - [ ] 固定 `can_left` 和 `can_right`。
-- [ ] 实现 `CanTransport`。
-- [ ] 记录原始 CAN 帧。
+- [x] 实现 `CanTransport`。
+- [x] 用 `record_can` 记录原始 CAN 帧。
 - [ ] 识别固件档位。
 - [ ] 解析两条臂的关节反馈。
 - [ ] 把每个解析字段与 `pyAgxArm` 对比。
@@ -68,4 +68,4 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-今天的预期结果：配置成功，构建没有目标，ctest 找不到测试。
+今天的预期结果：配置成功，`can_transport_test` 通过 5 个未打开套接字和接口不存在的用例，并生成 `record_can`。这些测试不打开真实总线。
