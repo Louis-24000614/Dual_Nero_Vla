@@ -1,113 +1,77 @@
-# AgileX 机械臂 URDF 模型
+# Dual Nero VLA
 
-[English](./README_EN.md)
+[English docs](docs/README.md) | [中文文档](docs_cn/README_cn.md)
 
-本仓库包含 AgileX 系列机械臂的 URDF / Xacro 模型文件及对应的 3D 网格（mesh）资源，供 ROS / ROS2 可视化、仿真和运动规划使用。
+Dual Nero VLA is a design for two AgileX Nero 7-DoF arms and two AGX two-finger grippers. A future C++ service owns Linux SocketCAN, arm state, and safety, and it is the only process allowed to send CAN command frames. Python owns cameras, datasets, LeRobot, and VLA inference, and it requests motion over IPC.
 
-> **定位说明**：本仓库**主要服务于** [agx_arm_ros](https://github.com/agilexrobotics/agx_arm_ros) 主仓库（作为其中的子模块，与主仓内的 `agx_arm_description` 功能包一同安装）。  
-> 若你仅在非 AgileX 主仓场景下使用，可按下文「独立使用」自行创建**同名**功能包。
+**Target design — not implemented.** This repository does not yet contain that service. `AgileX/` keeps the vendor models and the Nero protocol reference. Implementation follows the [roadmap](docs/maintenance/roadmap.md).
 
----
-
-## 支持的型号
-
-| 型号 | 目录 | 基础 URDF | 夹爪 Xacro |
-|------|------|-----------|------------|
-| Nero | `nero/` | `nero_description.urdf` | `nero_with_gripper_description.xacro` |
-| AGX 两指夹爪 | `agx_gripper/` | `agx_gripper_description.urdf` | — |
-
----
-
-## 目录结构
-
-```
-agx_arm_urdf/
-├── nero/
-│   ├── meshes/dae/
-│   └── urdf/
-└── agx_gripper/
-    ├── meshes/dae/
-    └── urdf/
-```
-
----
-
-## 使用方式
-
-### 推荐：随主仓库使用
-
-通过 [agx_arm_ros](https://github.com/agilexrobotics/agx_arm_ros) 克隆（含子模块）：
-
-```bash
-git clone -b ros2 --recurse-submodules https://github.com/agilexrobotics/agx_arm_ros.git
+```mermaid
+flowchart TB
+  subgraph py ["Python"]
+    cameras["Cameras"] --> dataset["LeRobot dataset"]
+    dataset --> policy["ACT / SmolVLA / OpenVLA"]
+  end
+  subgraph cpp ["dual_nero_server"]
+    ipc["ZeroMQ + Protobuf"]
+    pipeline["limits and watchdog"]
+    canL["can_left"]
+    canR["can_right"]
+    sync["state sync"]
+    ipc --> pipeline
+    pipeline --> canL
+    pipeline --> canR
+    sync --> ipc
+  end
+  policy -->|"action chunk"| ipc
+  canL --> leftArm["left Nero"]
+  canR --> rightArm["right Nero"]
+  leftArm -->|"feedback"| sync
+  rightArm -->|"feedback"| sync
 ```
 
-在 ROS2 中加载模型进行可视化（launch 由主仓提供）：
+## Read next
 
-```bash
-ros2 launch agx_arm_description display.launch.py arm_type:=nero
+- [Architecture](docs/design/architecture.md) explains ownership and data flow.
+- [Setup](docs/usage/setup.md) covers the operator path from the host to a read-only CAN check.
+- [IPC contract](docs/interfaces/ipc.md) is the Python-to-C++ boundary.
+- [Modules](docs/develop/modules.md) names the C++ owners and the code rules.
+- [Logging](docs/debug/logging.md) and the [roadmap](docs/maintenance/roadmap.md) record failure evidence and the delivery order.
+
+## 中文
+
+Dual Nero VLA 面向两台 AgileX Nero 七自由度机械臂和两只 AGX 两指夹爪。计划中的 C++ 服务拥有 Linux SocketCAN、机械臂状态和安全保护，并且是唯一可以发送 CAN 控制帧的进程。Python 负责相机、数据集、LeRobot 和 VLA 推理，通过 IPC 请求运动。
+
+**目标设计，尚未实现。** 这个仓库里还没有该服务。`AgileX/` 保留厂商模型和 Nero 协议参考。实现顺序见[路线图](docs_cn/maintenance/roadmap_cn.md)。
+
+```mermaid
+flowchart TB
+  subgraph py ["Python"]
+    cameras["相机"] --> dataset["LeRobot 数据集"]
+    dataset --> policy["ACT / SmolVLA / OpenVLA"]
+  end
+  subgraph cpp ["dual_nero_server"]
+    ipc["ZeroMQ + Protobuf"]
+    pipeline["限幅与看门狗"]
+    canL["can_left"]
+    canR["can_right"]
+    sync["状态同步"]
+    ipc --> pipeline
+    pipeline --> canL
+    pipeline --> canR
+    sync --> ipc
+  end
+  policy -->|"动作块"| ipc
+  canL --> leftArm["左 Nero"]
+  canR --> rightArm["右 Nero"]
+  leftArm -->|"反馈"| sync
+  rightArm -->|"反馈"| sync
 ```
 
-更多用法请参阅 [agx_arm_ros 文档](https://github.com/agilexrobotics/agx_arm_ros)。
+## 接着读
 
----
-
-### 独立使用（自建工作空间）
-
-在不使用整个 `agx_arm_ros` 时，仍可只克隆本仓库，但需自己提供 **ROS 功能包**，且功能包**名称**必须为：`agx_arm_description`
-
-#### ROS 2（ament_cmake）
-
-```bash
-mkdir -p ~/ws/src && cd ~/ws/src
-ros2 pkg create --build-type ament_cmake agx_arm_description
-cd agx_arm_description
-git clone https://github.com/agilexrobotics/agx_arm_urdf.git agx_arm_urdf
-```
-
-在包内 `CMakeLists.txt` 中配置：
-
-```cmake
-install(DIRECTORY agx_arm_urdf
-  DESTINATION share/${PROJECT_NAME}
-)
-```
-
-然后：
-
-```bash
-cd ~/ws
-colcon build --packages-select agx_arm_description
-source install/setup.bash
-```
-
-#### ROS 1（catkin）
-
-```bash
-mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
-catkin_create_pkg agx_arm_description
-cd agx_arm_description
-git clone https://github.com/agilexrobotics/agx_arm_urdf.git agx_arm_urdf
-```
-
-在包内 `CMakeLists.txt` 中配置：
-
-```cmake
-install(DIRECTORY agx_arm_urdf
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-```
-
-然后：
-
-```bash
-cd ~/catkin_ws
-catkin_make   # 或 catkin build
-source devel/setup.bash
-```
-
----
-
-## 许可证
-
-本项目基于 [MIT License](./LICENSE) 发布。
+- [架构](docs_cn/design/architecture_cn.md) 说明所有权和数据流。
+- [环境与接通](docs_cn/usage/setup_cn.md) 从主机环境走到只读 CAN 检查。
+- [IPC 契约](docs_cn/interfaces/ipc_cn.md) 是 Python 与 C++ 的边界。
+- [模块](docs_cn/develop/modules_cn.md) 列出 C++ 责任划分和代码规则。
+- [日志](docs_cn/debug/logging_cn.md) 与[路线图](docs_cn/maintenance/roadmap_cn.md) 记录故障证据和交付顺序。
