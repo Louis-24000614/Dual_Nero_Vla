@@ -77,8 +77,6 @@ source install/setup.bash
 ros2 launch open_nero_description display.launch.py
 ```
 
-![](./open_nero.png)
-
 启动后会运行：
 
 - `robot_state_publisher`：发布机器人 TF

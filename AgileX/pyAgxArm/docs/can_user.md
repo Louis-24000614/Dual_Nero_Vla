@@ -24,19 +24,6 @@
 - You can also manually activate CAN, for example:
   `sudo ip link set can0 up type can bitrate 1000000`.
 
-### Windows (`agx_cando`)
-
-- `.sh` scripts in this repository are **not** for Windows.
-- Use `interface="agx_cando"` and channel indices such as `"0"`, `"1"`, `"2"`.
-- Before using the SDK, install the `python-can-agx-cando` plugin.
-
-### macOS (`Darwin`, `slcan`)
-
-- `.sh` scripts in this repository are **not** for macOS.
-- Use `interface="slcan"` with channel paths like `"/dev/ttyACM0"`.
-- Before using the default serial device, grant permission first:
-  `sudo chmod 777 /dev/ttyACM0`.
-
 ---
 
 ## Prerequisites
@@ -227,19 +214,6 @@ Run `ifconfig` and check if both `can_left` and `can_right` appear.
 - Linux 的脚本化流程详见下方 `1`、`2`、`3` 章节。
 - 也可手动激活 CAN，例如：
   `sudo ip link set can0 up type can bitrate 1000000`。
-
-### Windows（`agx_cando`）
-
-- 仓库中的 `.sh` 脚本**不适用于 Windows**。
-- 使用 `interface="agx_cando"`，`channel` 通常写 `"0"`、`"1"`、`"2"`。
-- 使用 SDK 前，需要先安装 `python-can-agx-cando` 插件。
-
-### macOS（`Darwin`，`slcan`）
-
-- 仓库中的 `.sh` 脚本**不适用于 macOS**。
-- 使用 `interface="slcan"`，`channel` 通常写 `"/dev/ttyACM0"`。
-- 使用默认串口前，先赋予权限：
-  `sudo chmod 777 /dev/ttyACM0`。
 
 ---
 

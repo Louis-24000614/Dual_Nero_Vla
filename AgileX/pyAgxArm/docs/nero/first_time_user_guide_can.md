@@ -91,10 +91,6 @@ while not robot.enable():
 | 1.12 | Power on → `connect()` → `enable()` (`NeroFW.V112`) |
 | ≤ 1.11 | Web UI CAN push **or** `set_normal_mode()` while enabling |
 
-Example `candump can0` stream:
-
-![alt text](../../assets/pictures/candump_can0.png)
-
 Read joint angles after connect (V112: no `set_normal_mode()`):
 
 ```python
@@ -227,10 +223,6 @@ while not robot.enable():
 | 1.20 | 上电 → `connect()` → `enable()`（`NeroFW.V120`） |
 | 1.12 | 上电 → `connect()` → `enable()`（`NeroFW.V112`） |
 | ≤ 1.11 | 网页 CAN 推送 **或** 使能时 `set_normal_mode()` |
-
-正常 `candump can0` 数据流：
-
-![alt text](../../assets/pictures/candump_can0.png)
 
 读取关节角示例（V112 无需 `set_normal_mode()`）：
 

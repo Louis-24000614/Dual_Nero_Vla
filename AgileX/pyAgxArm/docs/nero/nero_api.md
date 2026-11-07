@@ -170,14 +170,14 @@ create_agx_arm_config(
 | Name | Type | Description |
 | --- | --- | --- |
 | `joint_limits` | `dict` | Custom joint limits (unit: rad). Defaults are assigned automatically; manually entered limits are not currently applied to actual control. See example below |
-| `channel` | `str` | CAN channel identifier. Default `"can0"`. The documented and verified combinations are: with `"agx_cando"` use device index strings such as `"0"`, `"1"`, `"2"`; with `"socketcan"` use Linux CAN netdev names such as `"can0"` or your renamed interface; with `"slcan"` use serial device paths such as `"/dev/ttyACM0"` on macOS (`Darwin`). |
-| `interface` | `str` | CAN interface type, default `"socketcan"`. The documented and verified values are `"socketcan"` on Linux, `"agx_cando"` on Windows with the Agilex CANDO backend, and `"slcan"` on macOS (`Darwin`). |
+| `channel` | `str` | CAN channel identifier. Default `"can0"`. With `"socketcan"`, use the Linux CAN netdev name, such as `"can0"` or a renamed interface. |
+| `interface` | `str` | CAN interface type, default `"socketcan"`. |
 | `bitrate` | `int` | CAN baud rate, default `1000000` (1 Mbps) |
-| `enable_check_can` | `bool` | Whether to check the CAN module when creating the Comm instance, default `True`. This pre-check is currently only effective for Linux `socketcan`; for other backends (for example, Windows `agx_cando` and macOS `slcan`) the actual availability check happens when the CAN bus is opened. |
+| `enable_check_can` | `bool` | Whether to check the CAN module when creating the Comm instance, default `True`. This pre-check applies to Linux `socketcan`. |
 | `auto_connect` | `bool` | Whether to automatically create the CAN Bus instance, default `True` |
 | `timeout` | `float` | CAN Bus read/write timeout (seconds), default `1.0` |
-| `receive_own_messages` | `bool` | Whether the local CAN backend should receive frames sent by the same process/device. Default `False`. This is useful for debugging, loopback tests, or virtual/single-node verification, but is usually not recommended for normal arm control. Backend support depends on the selected `interface`. The `slcan` backend on macOS generally does not support this; **do not pass** it when using `interface="slcan"`. |
-| `local_loopback` | `bool` | Whether to enable CAN **local loopback**. Default is `False` (loopback disabled), so your local terminal/process will **not** receive the CAN frames it sends itself. You may enable it for debugging, but it is **not recommended** for normal SDK usage because it may consume bus receive resources and impact reading performance. The `slcan` backend on macOS generally does not support this; **do not pass** it when using `interface="slcan"`. |
+| `receive_own_messages` | `bool` | Whether the local CAN backend should receive frames sent by the same process/device. Default `False`. This is useful for debugging, loopback tests, or virtual/single-node verification, but is usually not recommended for normal arm control. |
+| `local_loopback` | `bool` | Whether to enable CAN **local loopback**. Default is `False` (loopback disabled), so your local terminal/process will **not** receive the CAN frames it sends itself. You may enable it for debugging, but it is **not recommended** for normal SDK usage because it may consume bus receive resources and impact reading performance. |
 
 **Return Value:** `dict`
 
@@ -217,14 +217,9 @@ Example return structure:
 }
 ```
 
-Verified interface/channel examples:
+Verified interface/channel example:
 
 - Linux `socketcan`: `create_agx_arm_config(..., interface="socketcan", channel="can0")`
-- Windows `agx_cando`: `create_agx_arm_config(..., interface="agx_cando", channel="0")`
-- macOS `slcan`: `create_agx_arm_config(..., interface="slcan", channel="/dev/ttyACM0")`
-
-On Windows, `interface="agx_cando"` requires the separately installed `python-can-agx-cando` plugin. Install it from `https://github.com/agilexrobotics/python-can-agx-cando.git`, then run `pip3 install .` in that repository before using `pyAgxArm`.
-On macOS (`Darwin`), when using `interface="slcan"` with the default channel, grant serial permission first.
 
 **Usage Example:**
 
@@ -2510,14 +2505,14 @@ create_agx_arm_config(
 | 名称 | 类型 | 说明 |
 | --- | --- | --- |
 | `joint_limits` | `dict` | 自定义关节限位（单位：rad）。默认自动赋值，暂不会将手动输入的限位生效到实际控制中。示例见下文 |
-| `channel` | `str` | CAN 通道标识，默认 `"can0"`。当前文档已验证的写法为：`"agx_cando"` 使用 `"0"`、`"1"`、`"2"` 这类设备索引字符串；`"socketcan"` 使用 Linux 下的 CAN 网卡名，例如 `"can0"` 或重命名后的接口名；`"slcan"` 在 macOS（`Darwin`）下使用串口设备路径，例如 `"/dev/ttyACM0"`。 |
-| `interface` | `str` | CAN 接口类型，默认 `"socketcan"`。当前文档已验证并提供说明的取值为 Linux 下的 `"socketcan"`、Windows 下 Agilex CANDO 后端使用的 `"agx_cando"`、以及 macOS（`Darwin`）下的 `"slcan"`。 |
+| `channel` | `str` | CAN 通道标识，默认 `"can0"`。`"socketcan"` 使用 Linux 下的 CAN 网卡名，例如 `"can0"` 或重命名后的接口名。 |
+| `interface` | `str` | CAN 接口类型，默认 `"socketcan"`。 |
 | `bitrate` | `int` | CAN 波特率，默认 `1000000`（1 Mbps） |
-| `enable_check_can` | `bool` | 是否在创建 Comm 实例时检查 CAN 模块，默认 `True`。当前该预检查主要只对 Linux `socketcan` 生效；其他后端（如 Windows `agx_cando`、macOS `slcan`）通常会在实际打开 CAN bus 时完成可用性检查。 |
+| `enable_check_can` | `bool` | 是否在创建 Comm 实例时检查 CAN 模块，默认 `True`。该预检查对 Linux `socketcan` 生效。 |
 | `auto_connect` | `bool` | 是否自动创建 CAN Bus 实例，默认 `True` |
 | `timeout` | `float` | CAN Bus 读写超时时间（秒），默认 `1.0` |
-| `receive_own_messages` | `bool` | 是否让本地 CAN 后端接收由同一进程/设备发送出去的报文。默认 `False`。适合调试、回环测试或单节点联调，正常机械臂控制一般不建议开启。具体是否生效取决于所选 `interface`。macOS 下的 `slcan` 后端通常**不支持**该项；使用 `interface="slcan"` 时**不要**传入。 |
-| `local_loopback` | `bool` | 是否开启 CAN **本地回环**。默认 `False`（关闭回环），本地终端/进程将**无法**接收到自己发送的 CAN 报文。调试时可选择开启，但**不建议**在正常使用 SDK 时开启，因为可能会占用读取 bus 的资源并影响读取性能。macOS 下的 `slcan` 后端通常**不支持**该项；使用 `interface="slcan"` 时**不要**传入。 |
+| `receive_own_messages` | `bool` | 是否让本地 CAN 后端接收由同一进程/设备发送出去的报文。默认 `False`。适合调试、回环测试或单节点联调，正常机械臂控制一般不建议开启。 |
+| `local_loopback` | `bool` | 是否开启 CAN **本地回环**。默认 `False`（关闭回环），本地终端/进程将**无法**接收到自己发送的 CAN 报文。调试时可选择开启，但**不建议**在正常使用 SDK 时开启，因为可能会占用读取 bus 的资源并影响读取性能。 |
 
 **返回值：** `dict`
 
@@ -2558,11 +2553,6 @@ create_agx_arm_config(
 已验证的接口与通道填写示例：
 
 - Linux `socketcan`：`create_agx_arm_config(..., interface="socketcan", channel="can0")`
-- Windows `agx_cando`：`create_agx_arm_config(..., interface="agx_cando", channel="0")`
-- macOS `slcan`：`create_agx_arm_config(..., interface="slcan", channel="/dev/ttyACM0")`
-
-在 Windows 上使用 `interface="agx_cando"` 前，需要先单独安装 `python-can-agx-cando` 插件。可先从 `https://github.com/agilexrobotics/python-can-agx-cando.git` 克隆仓库，再进入仓库目录执行 `pip3 install .` 完成安装。
-在 macOS（`Darwin`）下使用 `interface="slcan"` 且默认通道时，需要先给予串口权限。
 
 **使用示例：**
 

@@ -13,7 +13,7 @@ First stable release of the Python SDK for Agilex robotic arms. This version uni
 
 ### Features
 
-- **CAN communication**: Unified `CanComm` implementation across Linux / macOS / Windows via `python-can`.
+- **CAN communication**: Unified `CanComm` implementation on Linux via `python-can`.
 - **Drivers & firmware variants**: Piper (`DEFAULT`, `v183`, `v188`, `v189`), Nero (`DEFAULT`, `v111`, `v112`, `v120`, `v121`); Piper H / L / X re-export versioned subpackages.
 - **Public API**: `ArmModel`, `PiperFW`, `NeroFW` in `arm_options`; extended `AgxArmFactory` registration; root package exports `__version__` and option enums.
 - **Firmware profile resolution**: Added the public `resolve_firmware_profile(robot, firmware_version)` API so applications can map the version returned by `get_firmware()` to the SDK-supported Piper/Nero driver profile without duplicating version rules.
@@ -32,7 +32,7 @@ First stable release of the Python SDK for Agilex robotic arms. This version uni
 
 - Removed unused legacy `can_send` native module tree from the repository.
 - **Source distribution**: `MANIFEST.in` includes `tests/` so sdist consumers receive the full test tree and docs under `tests/`.
-- Demos updated for series detection and `arm_options`; documentation refresh including WSL2 USB-CAN guidance where applicable.
+- Demos updated for series detection and `arm_options`; documentation refresh.
 
 ---
 
@@ -51,7 +51,7 @@ First stable release of the Python SDK for Agilex robotic arms. This version uni
 
 ### 特性
 
-- **CAN 通信**：在 Linux / macOS / Windows 上通过 `python-can` 统一 `CanComm` 实现。
+- **CAN 通信**：在 Linux 上通过 `python-can` 统一 `CanComm` 实现。
 - **驱动与固件分支**：Piper（`DEFAULT`、`v183`、`v188`、`v189`）、Nero（`DEFAULT`、`v111`、`v112`、`v120`、`v121`）；Piper H / L / X 通过 `versions` 子包重导出。
 - **对外 API**：`arm_options` 中的 `ArmModel`、`PiperFW`、`NeroFW`；扩展 `AgxArmFactory` 注册表；根包导出 `__version__` 与选项枚举。
 - **固件档位解析**：新增公开接口 `resolve_firmware_profile(robot, firmware_version)`，应用可将 `get_firmware()` 返回的版本映射为 SDK 支持的 Piper/Nero 驱动档位，无需重复维护版本规则。
@@ -70,4 +70,4 @@ First stable release of the Python SDK for Agilex robotic arms. This version uni
 
 - 移除仓库中未再引用的遗留 `can_send` 原生模块目录。
 - **源码包**：`MANIFEST.in` 通过 `graft tests/` 将完整 `tests/` 纳入 sdist，便于下游获取测试与说明文档。
-- 系列检测脚本与 `arm_options` 对齐；文档更新（含 WSL2 USB-CAN 等相关说明）。
+- 系列检测脚本与 `arm_options` 对齐；文档更新。
