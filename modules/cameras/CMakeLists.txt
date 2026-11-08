@@ -1,0 +1,11 @@
+if(BUILD_TESTING)
+  add_executable(camera_frame_test tests/camera_frame_test.cpp)
+  target_include_directories(camera_frame_test PRIVATE include)
+  target_compile_options(camera_frame_test PRIVATE -Wall -Wextra -Wpedantic)
+  target_link_libraries(camera_frame_test PRIVATE GTest::gtest_main)
+  include(GoogleTest)
+  gtest_discover_tests(camera_frame_test)
+endif()
+
+add_subdirectory(environment)
+add_subdirectory(wrist)

@@ -6,28 +6,23 @@
 
 ## 目录
 
-产品树按模块增长。根目录 `CMakeLists.txt` 固定语言标准，并编译 `dual_nero_can_transport` 和只读工具 `record_can`。
+产品树按模块增长。根目录 `CMakeLists.txt` 固定语言标准，并编译 `dual_nero_can_transport` 和只读工具 `record_can`。安装了 librealsense 时还会编译 D435 库和 `capture_d435`。
+
+当前能编译的树分成两组设备。`modules/arm` 负责 SocketCAN。`modules/cameras` 负责图像。相机库不会链进机械臂工具。
 
 ```text
-CMakeLists.txt
-config/dual_nero.example.yaml          示例，尚未加载
-proto/dual_nero.proto                   IPC 契约源文件
-modules/can_transport/
-modules/firmware_profile/
-modules/nero_protocol/
-modules/nero_driver/
-modules/state_synchronizer/
-modules/command_buffer/
-modules/safety_supervisor/
-modules/dual_nero_server/
-apps/                                   探测、只读、使能、回零、记录
-python/dual_nero_client/
-python/lerobot_robot_dual_nero/
-tests/protocol/  tests/safety/  tests/synchronization/  tests/vcan/
-tools/                                  activate_can.sh、create_vcan.sh、inspect_log.py
+modules/arm/transport/                 SocketCAN 原始帧
+modules/cameras/                       共用的 CameraFrame
+modules/cameras/environment/           场景 RealSense D435
+modules/cameras/wrist/                 腕部 Orbbec Dabai DC1
+apps/arm/record_can.cpp                只读 CAN 记录
+apps/cameras/capture_d435.cpp          一张 D435 彩色图和深度图
+apps/cameras/capture_dc1.cpp           一张 DC1 彩色图和深度图
 ```
 
-每个模块目录包含 `CMakeLists.txt`、`include/dual_nero/` 下的公开头文件，以及 `src/` 下的私有源文件。`AgileX/` 不进入这个布局。
+下面这些责任已经写在后文里，目录还没有建：`firmware_profile`、`nero_protocol`、`nero_driver`、`state_synchronizer`、`command_buffer`、`safety_supervisor`、`dual_nero_server`。
+
+每个已经存在的模块目录包含 `CMakeLists.txt`、`include/dual_nero/` 下的公开头文件，以及 `src/` 下的私有源文件。`AgileX/` 不进入这个布局。
 
 ## 固件与单位
 
@@ -39,7 +34,7 @@ tools/                                  activate_can.sh、create_vcan.sh、inspe
 
 ## 职责
 
-`CanTransport` 打开一个 SocketCAN 接口并收发原始帧。它使用 `PF_CAN`、`SOCK_RAW` 和 `CAN_RAW`，用 `SIOCGIFINDEX` 绑定，用 `poll` 或 `epoll` 等待。它检查短读、短写、`ENETDOWN`、`ENOBUFS`、设备拔出和 bus-off，记录错误帧，并在析构时关闭文件描述符。它不会吞掉未知失败后继续使用过期状态。总线断开会报告给安全监控器。
+`CanTransport` 位于 `modules/arm/transport`。它打开一个 SocketCAN 接口并收发原始帧。它使用 `PF_CAN`、`SOCK_RAW` 和 `CAN_RAW`，用 `SIOCGIFINDEX` 绑定，用 `poll` 或 `epoll` 等待。它检查短读、短写、`ENETDOWN`、`ENOBUFS`、设备拔出和 bus-off，记录错误帧，并在析构时关闭文件描述符。它不会吞掉未知失败后继续使用过期状态。总线断开会报告给安全监控器。
 
 `NeroProtocol` 是某个固件档位的纯编码器和解析器。它没有线程、套接字或进程级全局状态。编码路径拒绝超范围、NaN 和无穷大，缩放前检查物理单位，缩放后检查整数溢出，并且结果确定。
 
@@ -55,7 +50,7 @@ tools/                                  activate_can.sh、create_vcan.sh、inspe
 
 ## 公开头文件草图
 
-下面的声明是预期的所有权边界。它们还没有编译，第一份模块落地之前方法列表可以改变。单位是弧度和米。`open` 和 `connect` 在套接字或机械臂会话建立期间阻塞。`receive` 阻塞到收到一帧或超时。`close`、`disconnect`、`stop`、`disable` 和 `emergency_stop` 不抛出异常。`open`、`send` 或 `enable` 失败时把系统或协议错误交给调用方，而不是让对象看起来仍然处于已连接状态。
+草图里的 `CanTransport` 就是编译在 `modules/arm/transport` 中的类。它搬运一条原始 `can_frame`。`NeroProtocol` 仍是草图，还没有编译。这份草图的单位是弧度和米。`open` 和 `connect` 在套接字或机械臂会话建立期间阻塞。`receive` 阻塞到收到一帧或超时。`close`、`disconnect`、`stop`、`disable` 和 `emergency_stop` 不抛出异常。`open`、`send` 或 `enable` 失败时把系统或协议错误交给调用方，而不是让对象看起来仍然处于已连接状态。
 
 ```cpp
 namespace dual_nero {

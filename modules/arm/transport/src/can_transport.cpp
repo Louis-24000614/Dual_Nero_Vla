@@ -1,4 +1,4 @@
-#include "dual_nero/can_transport.hpp"
+#include "dual_nero/arm/can_transport.hpp"
 
 #include <linux/can/error.h>
 #include <linux/can/raw.h>

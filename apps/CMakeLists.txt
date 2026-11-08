@@ -1,3 +1,15 @@
-add_executable(record_can record_can.cpp)
+add_executable(record_can arm/record_can.cpp)
 target_compile_options(record_can PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(record_can PRIVATE dual_nero_can_transport)
+
+if(TARGET dual_nero_realsense_d435)
+  add_executable(capture_d435 cameras/capture_d435.cpp)
+  target_compile_options(capture_d435 PRIVATE -Wall -Wextra -Wpedantic)
+  target_link_libraries(capture_d435 PRIVATE dual_nero_realsense_d435)
+endif()
+
+if(TARGET dual_nero_dabai_dc1)
+  add_executable(capture_dc1 cameras/capture_dc1.cpp)
+  target_compile_options(capture_dc1 PRIVATE -Wall -Wextra -Wpedantic)
+  target_link_libraries(capture_dc1 PRIVATE dual_nero_dabai_dc1)
+endif()

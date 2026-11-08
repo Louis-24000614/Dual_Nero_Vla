@@ -126,7 +126,7 @@ Compatible evolution adds optional fields with new numbers and documented defaul
 
 ## Python client shape
 
-The LeRobot adapter stays thin. `get_observation` maps the accepted C++ state into LeRobot keys. `send_action` returns the action the server applied. Camera keys `overhead`, `left_wrist`, and `right_wrist` are filled by Python. The dataset stores `observation.state` as the measured dual-arm state, `action` as the teach-pendant or model target, images from the three cameras, and `task` as the language instruction. The stored action is the limited command returned by C++, not only the original Python request.
+The LeRobot adapter stays thin. `get_observation` maps the accepted C++ state into LeRobot keys. `send_action` returns the action the server applied. The C++ program `capture_d435` produces the RealSense D435 frame stored later under `global`. `capture_dc1` reads the first connected Orbbec Dabai DC1. `left_wrist` and `right_wrist` are the later names for the two wrist cameras and are not assigned yet. The first teapot-grasp episodes store one arm, that wrist image, and the global image. The dataset stores `observation.state` as the measured arm state, `action` as the teach-pendant or model target, the camera images, and `task` as the language instruction. The stored action is the limited command returned by C++, not only the original Python request.
 
 ```python
 def get_observation(self) -> dict[str, float | object]:
@@ -136,7 +136,7 @@ def get_observation(self) -> dict[str, float | object]:
         "left.gripper.pos": state.left.gripper,
         "right.joint_1.pos": state.right.position[0],
         "right.gripper.pos": state.right.gripper,
-        "overhead": self.overhead_camera.read(),
+        "global": self.global_camera.read(),
         "left_wrist": self.left_wrist_camera.read(),
         "right_wrist": self.right_wrist_camera.read(),
     }

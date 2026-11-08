@@ -65,7 +65,7 @@ candump can_right
 
 ## 配置构建
 
-根工程设定 C++ 标准，并编译只读工具 `record_can`。它还不编译 `dual_nero_server`。
+根工程设定 C++ 标准，并编译 `apps/arm/record_can.cpp`。安装了 librealsense 时还会编译 `apps/cameras/capture_d435.cpp`。机械臂代码在 `modules/arm`，相机代码在 `modules/cameras`。它还不编译 `dual_nero_server`。
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -75,7 +75,23 @@ ctest --test-dir build --output-on-failure
 
 安装 `ninja-build` 之后，可以在 `cmake -S` 命令上加上 `-G Ninja`。
 
-`cmake --build build` 会生成 `build/apps/record_can`。`ctest` 运行 `can_transport_test`，检查未打开的套接字和缺失的接口。这不是机械臂测试通过。
+`cmake --build build` 会生成 `build/apps/record_can`。安装了 librealsense 时还会生成 `build/apps/capture_d435`。本机有 Orbbec SDK 时还会生成 `build/apps/capture_dc1`。`ctest` 运行 CAN 测试和未打开相机的测试。这些测试不打开真实总线或相机。
+
+相机插上之后，保存一张 D435 彩色图和深度图：
+
+```bash
+./build/apps/capture_d435 /tmp
+```
+
+这会写出 `/tmp/d435_color.ppm` 和 `/tmp/d435_depth.pgm`。深度值的单位是毫米。这个程序不打开 CAN。
+
+用同样的方式保存一张 Dabai DC1 彩色图和深度图：
+
+```bash
+./build/apps/capture_dc1 /tmp
+```
+
+这会写出 `/tmp/dc1_color.ppm` 和 `/tmp/dc1_depth.pgm`。程序打开名称里带有 `DC1` 的第一台设备，不打开 CAN。
 
 ## 真机顺序
 

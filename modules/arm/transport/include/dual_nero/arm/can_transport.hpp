@@ -8,7 +8,8 @@
 
 namespace dual_nero {
 
-// Owns one classic CAN socket for a single SocketCAN interface.
+// Arm transport. Owns one classic CAN socket for a single SocketCAN interface.
+// This object does not decode Nero fields and does not open a camera.
 // The caller brings the interface up and sets the bitrate before open().
 // open() blocks only while the socket is created and bound. On failure the
 // transport stays closed and throws std::system_error.

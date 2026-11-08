@@ -39,7 +39,7 @@ Acceptance: a stale sample on one arm stops advance for both arms.
 ## Phase D — demonstration capture
 
 - [ ] Read both teach pendants in the C++ process.
-- [ ] Capture the cameras.
+- [ ] Capture the global RealSense D435 and the wrist Orbbec Dabai DC1. The first episodes use one arm and its wrist camera.
 - [ ] Align timestamps.
 - [ ] Implement the LeRobot `Robot` adapter.
 - [ ] Implement the LeRobot `Teleoperator` adapter.
@@ -55,6 +55,14 @@ Acceptance: replay preserves the order of both arms, both grippers, and the imag
 - [ ] Measure on-robot success.
 - [ ] Connect SmolVLA.
 - [ ] Later, connect OpenVLA-OFT.
+
+## Task milestones
+
+These milestones sit on phases A–E. The first dataset and the first policy use one arm.
+
+- [ ] Milestone 1: one Nero grasps a teapot. Observations are that arm's joints, its wrist Dabai DC1, and the global RealSense D435.
+- [ ] Milestone 2: the two arms grasp separate objects. Each wrist uses a Dabai DC1. The global camera remains the D435.
+- [ ] Milestone 3: the two arms pour tea. This waits until milestone 2 is reliable.
 
 ## Non-goals for the first version
 

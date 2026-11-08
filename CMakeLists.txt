@@ -10,5 +10,6 @@ include(CTest)
 find_package(GTest REQUIRED)
 
 # Modules are added in dependency order.
-add_subdirectory(modules/can_transport)
+add_subdirectory(modules/arm)
+add_subdirectory(modules/cameras)
 add_subdirectory(apps)

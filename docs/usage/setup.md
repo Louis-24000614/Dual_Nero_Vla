@@ -65,7 +65,7 @@ candump can_right
 
 ## Configure the build
 
-The root project sets the C++ standard and builds the read-only `record_can` tool. It does not compile `dual_nero_server` yet.
+The root project sets the C++ standard and builds `apps/arm/record_can.cpp` and, when librealsense is installed, `apps/cameras/capture_d435.cpp`. Arm code is under `modules/arm`. Camera code is under `modules/cameras`. It does not compile `dual_nero_server` yet.
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -75,7 +75,23 @@ ctest --test-dir build --output-on-failure
 
 After `ninja-build` is installed, add `-G Ninja` to the `cmake -S` command.
 
-`cmake --build build` produces `build/apps/record_can`. `ctest` runs `can_transport_test`, which checks a closed socket and a missing interface. That is not a passing arm test.
+`cmake --build build` produces `build/apps/record_can`, `build/apps/capture_d435` when librealsense is installed, and `build/apps/capture_dc1` when the Orbbec SDK is present. `ctest` runs the CAN tests and the closed-camera tests. Those tests do not open a live bus or a camera.
+
+Save one D435 color image and depth image after the camera is plugged in:
+
+```bash
+./build/apps/capture_d435 /tmp
+```
+
+This writes `/tmp/d435_color.ppm` and `/tmp/d435_depth.pgm`. Depth values are millimeters. The program does not open CAN.
+
+Save one Dabai DC1 color image and depth image the same way:
+
+```bash
+./build/apps/capture_dc1 /tmp
+```
+
+This writes `/tmp/dc1_color.ppm` and `/tmp/dc1_depth.pgm`. The program opens the first device whose name contains `DC1` and does not open CAN.
 
 ## Hardware order
 

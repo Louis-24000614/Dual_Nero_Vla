@@ -126,7 +126,7 @@ ActionChunk sequence=1 valid_until_ns=<未来的单调时间 ns>
 
 ## Python 客户端形状
 
-LeRobot 适配层保持很薄。`get_observation` 把 C++ 接受的状态映射成 LeRobot 键。`send_action` 返回服务实际应用的动作。相机键 `overhead`、`left_wrist` 和 `right_wrist` 由 Python 填写。数据集把 `observation.state` 存为实测双臂状态，把 `action` 存为示教器或模型目标，图像来自三台相机，`task` 是语言指令。存下的动作是 C++ 返回的限幅命令，不只是 Python 的原始请求。
+LeRobot 适配层保持很薄。`get_observation` 把 C++ 接受的状态映射成 LeRobot 键。`send_action` 返回服务实际应用的动作。C++ 程序 `capture_d435` 产生 RealSense D435 的图像，以后记在 `global` 下面。`capture_dc1` 读取第一台连上的 Orbbec Dabai DC1。`left_wrist` 和 `right_wrist` 是以后两只腕部相机的名字，现在还没有分配左右。抓茶壶的第一批数据保存一条臂、该腕图像和全局图像。数据集把 `observation.state` 存为实测机械臂状态，把 `action` 存为示教器或模型目标，同时保存相机图像，`task` 是语言指令。存下的动作是 C++ 返回的限幅命令，不只是 Python 的原始请求。
 
 ```python
 def get_observation(self) -> dict[str, float | object]:
@@ -136,7 +136,7 @@ def get_observation(self) -> dict[str, float | object]:
         "left.gripper.pos": state.left.gripper,
         "right.joint_1.pos": state.right.position[0],
         "right.gripper.pos": state.right.gripper,
-        "overhead": self.overhead_camera.read(),
+        "global": self.global_camera.read(),
         "left_wrist": self.left_wrist_camera.read(),
         "right_wrist": self.right_wrist_camera.read(),
     }

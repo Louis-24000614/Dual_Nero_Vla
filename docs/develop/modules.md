@@ -6,28 +6,23 @@
 
 ## Layout
 
-The product tree grows by module. The root `CMakeLists.txt` pins the language standard and builds `dual_nero_can_transport` plus the read-only `record_can` tool.
+The product tree grows by module. The root `CMakeLists.txt` pins the language standard and builds `dual_nero_can_transport`, the read-only `record_can` tool, and, when librealsense is installed, the D435 library plus `capture_d435`.
+
+The compiled tree has two device groups. `modules/arm` owns SocketCAN. `modules/cameras` owns images. A camera library is not linked into an arm tool.
 
 ```text
-CMakeLists.txt
-config/dual_nero.example.yaml          sample, not loaded
-proto/dual_nero.proto                   IPC contract source
-modules/can_transport/
-modules/firmware_profile/
-modules/nero_protocol/
-modules/nero_driver/
-modules/state_synchronizer/
-modules/command_buffer/
-modules/safety_supervisor/
-modules/dual_nero_server/
-apps/                                   detect, read, enable, home, record
-python/dual_nero_client/
-python/lerobot_robot_dual_nero/
-tests/protocol/  tests/safety/  tests/synchronization/  tests/vcan/
-tools/                                  activate_can.sh, create_vcan.sh, inspect_log.py
+modules/arm/transport/                 raw SocketCAN frames
+modules/cameras/                       shared CameraFrame
+modules/cameras/environment/           scene RealSense D435
+modules/cameras/wrist/                 wrist Orbbec Dabai DC1
+apps/arm/record_can.cpp                read-only CAN recorder
+apps/cameras/capture_d435.cpp          one D435 color and depth pair
+apps/cameras/capture_dc1.cpp           one DC1 color and depth pair
 ```
 
-Each module directory contains `CMakeLists.txt`, public headers under `include/dual_nero/`, and private sources under `src/`. `AgileX/` stays outside this layout.
+These owners are described below and are not directories yet: `firmware_profile`, `nero_protocol`, `nero_driver`, `state_synchronizer`, `command_buffer`, `safety_supervisor`, and `dual_nero_server`.
+
+Each existing module directory contains `CMakeLists.txt`, public headers under `include/dual_nero/`, and private sources under `src/`. `AgileX/` stays outside this layout.
 
 ## Firmware and units
 
@@ -39,7 +34,7 @@ The public Python SDK distinguishes Nero profiles `default`, `v111`, `v112`, `v1
 
 ## Responsibilities
 
-`CanTransport` opens one SocketCAN interface and sends or receives raw frames. It uses `PF_CAN`, `SOCK_RAW`, and `CAN_RAW`, binds with `SIOCGIFINDEX`, and waits with `poll` or `epoll`. It checks short reads, short writes, `ENETDOWN`, `ENOBUFS`, unplug, and bus-off, records error frames, and closes the descriptor in the destructor. It does not catch an unknown failure and continue with a stale state. Bus loss is reported to the safety supervisor.
+`CanTransport` lives in `modules/arm/transport`. It opens one SocketCAN interface and sends or receives raw frames. It uses `PF_CAN`, `SOCK_RAW`, and `CAN_RAW`, binds with `SIOCGIFINDEX`, and waits with `poll` or `epoll`. It checks short reads, short writes, `ENETDOWN`, `ENOBUFS`, unplug, and bus-off, records error frames, and closes the descriptor in the destructor. It does not catch an unknown failure and continue with a stale state. Bus loss is reported to the safety supervisor.
 
 `NeroProtocol` is a pure encoder and decoder for one firmware profile. It has no thread, socket, or process-global state. Encode paths reject out-of-range values, NaN, and infinity, check the physical unit before scaling, check integer overflow after scaling, and are deterministic.
 
@@ -55,7 +50,7 @@ Teach pendants, if they speak CAN, are read by the same C++ process so they shar
 
 ## Public header sketch
 
-The declarations below are the intended ownership boundary. They are not compiled, and the method list can change before the first module lands. Units are radians and meters. `open` and `connect` block while the socket or the arm session is established. `receive` blocks until a frame arrives or the timeout expires. `close`, `disconnect`, `stop`, `disable`, and `emergency_stop` do not throw. A failed `open`, `send`, or `enable` reports the system or protocol error to the caller instead of leaving the object looking connected.
+`CanTransport` in the sketch is the class compiled in `modules/arm/transport`. It moves one raw `can_frame`. `NeroProtocol` is still a sketch and is not compiled. Units for that sketch are radians and meters. `open` and `connect` block while the socket or the arm session is established. `receive` blocks until a frame arrives or the timeout expires. `close`, `disconnect`, `stop`, `disable`, and `emergency_stop` do not throw. A failed `open`, `send`, or `enable` reports the system or protocol error to the caller instead of leaving the object looking connected.
 
 ```cpp
 namespace dual_nero {
